@@ -7,13 +7,31 @@
 namespace DeejayFilesOrganizerBundle\Organizer;
 
 
+use DeejayFilesOrganizerBundle\Event\FileMovedEvent;
+use DeejayFilesOrganizerBundle\Event\OrganizerEvents;
 use DeejayFilesOrganizerBundle\Organizer\Rules\RuleInterface;
+use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 
 class OrganizerManager
 {
     /** @var array RuleInterface[] */
     private $rules = [];
+    /** @var  EventDispatcher */
+    protected $eventDispatcher;
+    /**
+     * @var Logger;
+     */
+    protected $logger;
+
+    public function __construct(
+        $eventDispatcher,
+        Logger $logger = null)
+    {
+        $this->logger               = $logger ? $logger : new NullLogger();
+        $this->eventDispatcher      = $eventDispatcher;
+    }
 
     public function addRule(RuleInterface $rule)
     {
@@ -61,10 +79,16 @@ class OrganizerManager
         if (!is_dir($dir)) {
             $fsys->mkdir($dir);
         }
-        $fsys->rename($moveInstruc->getOrigin(), $moveInstruc->getFinalDestination());
-        /*dump(sprintf('move %s to %s',
-            $moveInstruc->getOrigin(),
-            $moveInstruc->getFinalDestination()
-        ));*/
+        try {
+            $fsys->rename($moveInstruc->getOrigin(), $moveInstruc->getFinalDestination());
+            $this->eventDispatcher->dispatch(OrganizerEvents::FILE_HAS_MOVED, new FileMovedEvent($moveInstruc));
+            $this->logger->info(sprintf('move %s to %s',
+                $moveInstruc->getOrigin(),
+                $moveInstruc->getFinalDestination()
+            ));
+        } catch (\Exception $e) {
+            //$this->setMessage($message);
+        }
+        /*dump();*/
     }
 }

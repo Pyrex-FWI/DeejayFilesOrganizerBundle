@@ -28,7 +28,10 @@ $container
         $organizerManager,
         new Definition(
             '%'.$organizerManager.'.class%',
-            []
+            [
+                new Reference('event_dispatcher'),
+                new Reference('logger', \Symfony\Component\DependencyInjection\ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+            ]
         )
     )
 ;

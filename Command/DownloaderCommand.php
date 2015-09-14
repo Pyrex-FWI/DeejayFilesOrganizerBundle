@@ -4,7 +4,7 @@ namespace DeejayFilesOrganizerBundle\Command;
 
 use DeejayFilesOrganizerBundle\Entity\AvdItem;
 use DeejayFilesOrganizerBundle\Event\FilterTrackDownloadEvent;
-use DeejayFilesOrganizerBundle\Event\ProviderEvents;
+use DeejayFilesOrganizerBundle\Event\OrganizerEvents;
 use DeejayFilesOrganizerBundle\Event\ItemDownloadEvent;
 use DeejayFilesOrganizerBundle\Organizer\AvDistrictProvider;
 use DeejayFilesOrganizerBundle\Organizer\RuleInterface;
@@ -137,8 +137,8 @@ EOF
 
     private function registerListerners()
     {
-        $this->eventDispatcher->addListener(ProviderEvents::ITEM_SUCCESS_DOWNLOAD, [$this, 'incrementSuccessDownloaded']);
-        $this->eventDispatcher->addListener(ProviderEvents::ITEM_ERROR_DOWNLOAD, [$this, 'incrementErrorDownloaded']);
+        $this->eventDispatcher->addListener(OrganizerEvents::ITEM_SUCCESS_DOWNLOAD, [$this, 'incrementSuccessDownloaded']);
+        $this->eventDispatcher->addListener(OrganizerEvents::ITEM_ERROR_DOWNLOAD, [$this, 'incrementErrorDownloaded']);
     }
 
     public function incrementSuccessDownloaded(ItemDownloadEvent $event)
